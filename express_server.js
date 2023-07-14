@@ -11,6 +11,7 @@ const generateRandomString = () => {
 };
 
 const express = require("express");
+const cookieParser = require('cookie-parser'); // Import the cookie-parser module
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -22,6 +23,7 @@ const urlDatabase = {
 };
 
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -36,7 +38,12 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  console.log(req.cookies);
+  const username = req.cookies ? req.cookies["username"] : undefined;
+  const templateVars = {
+    username,
+    urls: urlDatabase
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -65,7 +72,6 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
   res.send("Ok"); // Respond with 'Ok' (we will replace this)

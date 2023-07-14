@@ -8,7 +8,7 @@
       data-target="#navbarNavAltMarkup"
       aria-controls="navbarNavAltMarkup"
       aria-expanded="false"
-      aria-label="Toggle navigation"
+      aria-label="Toggle navigation"p
     >
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -33,6 +33,19 @@
             </form>
           </div>
         <% } %>
+
+        <!-- User Registration Form -->
+        <form method="POST" action="/register" class="form-inline ml-auto">
+          <div class="form-group">
+            <label for="email" class="sr-only">Email:</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+          </div>
+          <div class="form-group">
+            <label for="password" class="sr-only">Password:</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn-outline-light ml-2">Register</button>
+        </form>
       </div>
     </div>
   </nav>

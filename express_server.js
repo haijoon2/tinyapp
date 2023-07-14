@@ -54,6 +54,16 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id;
+
+  // Use the delete operator to remove the URL from urlDatabase
+  delete urlDatabase[id];
+
+  // Redirect the client back to the urls_index page
+  res.redirect("/urls");
+});
+
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const shortURL = generateRandomString();

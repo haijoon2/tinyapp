@@ -71,6 +71,15 @@ app.post("/urls", (req, res) => {
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const longURL = req.body.longURL;
+  urlDatabase[id] = longURL;
+
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });

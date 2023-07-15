@@ -33,6 +33,10 @@ const users = {
   },
 };
 
+const getUserByEmail = (email) => {
+  return users[email];
+};
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -50,7 +54,7 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const email = req.cookies ? req.cookies["email"] : undefined;
-  const user = users[email];
+  const user = getUserByEmail(email);
   const  templateVars = {
     user,
     urls: urlDatabase
@@ -64,7 +68,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const email = req.cookies ? req.cookies["email"] : undefined;
-  const user = users[email];
+  const user = getUserByEmail(email);
   const templateVars = {
     id:  req.params.id,
     user,
@@ -93,7 +97,7 @@ app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
   urlDatabase[id] = longURL;
   const email = req.cookies ? req.cookies["email"] : undefined;
-  const user = users[email];
+  const user = getUserByEmail(email);
 
   const templateVars = {
     urls: urlDatabase,
@@ -110,7 +114,7 @@ app.post("/urls", (req, res) => {
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
-  const user = users[email];
+  const user = getUserByEmail(email);
 
   if (user) {
     res.cookie('email', email);
@@ -127,6 +131,14 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+
+  if (!email || !password) {
+    res.status(400).send("Email or Password cannot be empty");
+  }
+
+  if (getUserByEmail(email)) {
+    res.status(400).send("Email already exists");
+  }
   
   users[email] = {
     email,
@@ -139,7 +151,7 @@ app.post("/register", (req, res) => {
 
 app.get("/register", (req, res) => {
   const email = req.cookies ? req.cookies["email"] : undefined;
-  const user = users[email];
+  const user = getUserByEmail(email);
 
   const templateVars = {
     urls: urlDatabase,

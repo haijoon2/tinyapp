@@ -106,7 +106,13 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  res.render("register");
+  const username = req.cookies ? req.cookies["username"] : undefined;
+
+  const templateVars = {
+    urls: urlDatabase,
+    username
+  };
+  res.render("register", templateVars);
 });
 
 app.listen(PORT, () => {

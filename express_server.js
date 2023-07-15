@@ -112,6 +112,14 @@ app.post("/urls", (req, res) => {
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
+app.get("/login", (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    user: undefined
+  };
+  res.render("login", templateVars);
+});
+
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const user = getUserByEmail(email);

@@ -12,6 +12,7 @@ const generateRandomString = () => {
 
 const express = require("express");
 const cookieParser = require('cookie-parser'); // Import the cookie-parser module
+const bcrypt = require('bcrypt'); // Import the bcrypt module
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -32,12 +33,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "a@hotmail.com",
-    password: "aa",
+    password: "$2b$10$0hkaPo/jBAnfKKO3ePeV9e6m..F1nZHAZm1um6LG1myT4EhPMxdOq", //aa
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "b@hotmail.com",
-    password: "bb",
+    password: "$2b$10$FahsimwCsMUCeHD56gHKsONDy0HJ08LgexFWHlIUoeDBGvsdkWJ42",//bb
   },
 };
 
@@ -234,10 +235,17 @@ app.post("/login", (req, res) => {
     return;
   }
 
-  if (user.password !== password) {
+  const passwordMatch = bcrypt.compareSync(password, user.password); // Compare the password with the hashed password
+
+  if (!passwordMatch) {
     res.status(403).send("<h1>Password incorrect</h1>");
     return;
   }
+
+  // if (user.password !== password) {
+  //   res.status(403).send("<h1>Password incorrect</h1>");
+  //   return;
+  // }
 
   res.cookie('email', email);
   res.redirect("/urls");

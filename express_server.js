@@ -119,6 +119,14 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+  const email = req.cookies ? req.cookies["email"] : undefined;
+  const user = getUserByEmail(email);
+
+  if (user) {
+    res.redirect("/urls");
+    return;
+  }
+
   const templateVars = {
     urls: urlDatabase,
     user: undefined
@@ -174,6 +182,11 @@ app.post("/register", (req, res) => {
 app.get("/register", (req, res) => {
   const email = req.cookies ? req.cookies["email"] : undefined;
   const user = getUserByEmail(email);
+
+  if (user) {
+    res.redirect("/urls");
+    return;
+  }
 
   const templateVars = {
     urls: urlDatabase,

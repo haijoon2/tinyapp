@@ -116,6 +116,16 @@ app.get("/urls/:id", (req, res) => {
   const user = getUserByEmail(email);
   const id = req.params.id;
 
+  if (!urlDatabase[id]) {
+    res.status(404).send("<h1>URL not found</h1>");
+    return;
+  }
+
+  if (!user) {
+    res.status(401).send("<h1>Please login or register</h1>");
+    return;
+  }
+
   if (urlDatabase[id].userID !== user.id) {
     res.status(403).send("<h1>You do not have permission to edit this URL</h1>");
     return;
@@ -141,20 +151,34 @@ app.get("/u/:id", (req, res) => {
 
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
+  const email = req.cookies ? req.cookies["email"] : undefined;
+  const user = getUserByEmail(email);
 
-  // Use the delete operator to remove the URL from urlDatabase
-  delete urlDatabase[id];
+  if (!user) {
+    res.status(401).send("Please login or register");
+    return;
+  }
 
-  // Redirect the client back to the urls_index page
-  res.redirect("/urls");
+  if (urlDatabase[id].userID !== user.id) {
+    res.status(403).send("You do not have permission to delete this URL");
+    return;
+  }
+
+  delete urlDatabase[id];  // Use the delete operator to remove the URL from urlDatabase
+
+  res.redirect("/urls");  // Redirect the client back to the urls_index page
 });
 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = req.body.longURL;
-  urlDatabase[id] = longURL;
   const email = req.cookies ? req.cookies["email"] : undefined;
   const user = getUserByEmail(email);
+
+  urlDatabase[id] = {
+    longURL,
+    userID: user.id
+  };
 
   if (urlDatabase[id].userID !== user.id) {
     res.status(403).send("You do not have permission to edit this URL");
@@ -178,7 +202,10 @@ app.post("/urls", (req, res) => {
   }
   
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: user.id
+  };
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -224,6 +251,7 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const userID = generateRandomString();
 
   if (!email || !password) {
     res.status(400).send("Email or Password cannot be empty");
@@ -233,7 +261,8 @@ app.post("/register", (req, res) => {
     res.status(400).send("Email already exists");
   }
   
-  users[email] = {
+  users[userID] = {
+    id: userID,
     email,
     password
   };
@@ -252,7 +281,6 @@ app.get("/register", (req, res) => {
   }
 
   const templateVars = {
-    urls: urlsForUser(user.id),
     user
   };
   res.render("register", templateVars);

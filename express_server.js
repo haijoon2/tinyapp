@@ -261,10 +261,12 @@ app.post("/register", (req, res) => {
     res.status(400).send("Email already exists");
   }
   
+  const hashedPassword = bcrypt.hashSync(password, 10); // Hash the password
+
   users[userID] = {
     id: userID,
     email,
-    password
+    password: hashedPassword // Store the hashed password
   };
 
   res.cookie('email', email);

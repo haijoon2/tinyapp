@@ -11,12 +11,19 @@ const generateRandomString = () => {
 };
 
 const express = require("express");
-const cookieParser = require('cookie-parser'); // Import the cookie-parser module
 const bcrypt = require('bcrypt'); // Import the bcrypt module
+const cookieSession = require("cookie-session");
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
+
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieSession({ // Set up cookieSession
+  name: "session",
+  keys: ["key1", "key2"], // what is this for
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 const urlDatabase = {
   "b2xVn2": {
@@ -64,14 +71,13 @@ const urlsForUser = (id) => {
 };
 
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
 app.get("/urls.json", (req, res) => {
-  const email = req.cookies ? req.cookies["email"] : undefined;
+  const email = req.session ? req.session["email"] : undefined;
   const user = getUserByEmail(email);
   res.json(urlsForUser(user.id));
 });
@@ -81,7 +87,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const email = req.cookies ? req.cookies["email"] : undefined;
+  const email = req.session ? req.session["email"] : undefined;
   const user = getUserByEmail(email);
 
   if (!user) {
@@ -97,7 +103,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const email = req.cookies ? req.cookies["email"] : undefined;
+  const email = req.session ? req.session["email"] : undefined;
   const user = getUserByEmail(email);
 
   if (!user) {
@@ -113,7 +119,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const email = req.cookies ? req.cookies["email"] : undefined;
+  const email = req.session ? req.session["email"] : undefined;
   const user = getUserByEmail(email);
   const id = req.params.id;
 
@@ -152,7 +158,7 @@ app.get("/u/:id", (req, res) => {
 
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
-  const email = req.cookies ? req.cookies["email"] : undefined;
+  const email = req.session ? req.session["email"] : undefined;
   const user = getUserByEmail(email);
 
   if (!user) {
@@ -173,7 +179,7 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = req.body.longURL;
-  const email = req.cookies ? req.cookies["email"] : undefined;
+  const email = req.session ? req.session["email"] : undefined;
   const user = getUserByEmail(email);
 
   urlDatabase[id] = {
@@ -194,7 +200,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const email = req.cookies ? req.cookies["email"] : undefined;
+  const email = req.session ? req.session["email"] : undefined;
   const user = getUserByEmail(email);
 
   if (!user) {
@@ -211,7 +217,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  const email = req.cookies ? req.cookies["email"] : undefined;
+  const email = req.session ? req.session["email"] : undefined;
   const user = getUserByEmail(email);
 
   if (user) {
@@ -247,12 +253,12 @@ app.post("/login", (req, res) => {
   //   return;
   // }
 
-  res.cookie('email', email);
+  req.session.email = email;
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("email"); // Clear the email cookie
+  req.session.email = null; // Clear the email cookie
   res.redirect("/login"); // Redirect the user back to the /urls page
 });
 
@@ -277,12 +283,12 @@ app.post("/register", (req, res) => {
     password: hashedPassword // Store the hashed password
   };
 
-  res.cookie('email', email);
+  req.session.email = email; // Set the email cookie
   res.redirect("/urls");
 });
 
 app.get("/register", (req, res) => {
-  const email = req.cookies ? req.cookies["email"] : undefined;
+  const email = req.session ? req.session["email"] : undefined;
   const user = getUserByEmail(email);
 
   if (user) {

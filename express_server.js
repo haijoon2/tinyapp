@@ -18,23 +18,35 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "userRandomID"
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+    userID: "user2RandomID"
+  }
 };
 
 const users = {
-  "user@example.com": {
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+  "userRandomID": {
+    email: "a@hotmail.com",
+    password: "aa",
   },
   "user2RandomID": {
-    email: "user2@example.com",
-    password: "dishwasher-funk",
+    email: "b@hotmail.com",
+    password: "bb",
   },
 };
 
 const getUserByEmail = (email) => {
-  return users[email];
+  const keys = Object.keys(users);
+  for (const key of keys) {
+    if (users[key].email === email) {
+      return users[key];
+    }
+  }
+  return undefined;
 };
 
 app.use(express.urlencoded({ extended: true }));
@@ -84,13 +96,13 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id:  req.params.id,
     user,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id].longURL
   };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
 
   if (!longURL) {
     res.status(404).send("<h1>URL not found</h1>");

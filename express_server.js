@@ -65,6 +65,12 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const email = req.cookies ? req.cookies["email"] : undefined;
   const user = getUserByEmail(email);
+
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
+
   const  templateVars = {
     user,
     urls: urlDatabase
@@ -113,9 +119,17 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  const email = req.cookies ? req.cookies["email"] : undefined;
+  const user = getUserByEmail(email);
+
+  if (!user) {
+    res.status(403).send("Please login or register");
+    return;
+  }
+  
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.get("/login", (req, res) => {

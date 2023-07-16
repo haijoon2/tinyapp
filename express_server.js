@@ -63,7 +63,13 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const email = req.cookies ? req.cookies["email"] : undefined;
+  const user = getUserByEmail(email);
+  const  templateVars = {
+    user,
+    urls: urlDatabase
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -122,18 +128,26 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
+  const password = req.body.password;
   const user = getUserByEmail(email);
 
-  if (user) {
-    res.cookie('email', email);
+  if (!user) {
+    res.status(403).send("Email not found");
+    return;
   }
 
+  if (user.password !== password) {
+    res.status(403).send("Password incorrect");
+    return;
+  }
+
+  res.cookie('email', email);
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
   res.clearCookie("email"); // Clear the email cookie
-  res.redirect("/urls"); // Redirect the user back to the /urls page
+  res.redirect("/login"); // Redirect the user back to the /urls page
 });
 
 app.post("/register", (req, res) => {

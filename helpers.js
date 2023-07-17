@@ -1,3 +1,7 @@
+/**
+ * Returns a user object if the email is found
+ * in the database, otherwise returns undefined.
+ */
 const getUserByEmail = (email, userDataBase) => {
   const users = Object.values(userDataBase);
   for (const user of users) {

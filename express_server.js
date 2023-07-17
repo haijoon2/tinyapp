@@ -1,3 +1,6 @@
+/**
+ * Returns a random string of 6 alphanumeric characters.
+ */
 const generateRandomString = () => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
@@ -51,6 +54,10 @@ const users = {
   },
 };
 
+/**
+ * Returns an object containing only the URLs where the userID
+ * is equal to the id of the currently logged-in user.
+ */
 const urlsForUser = (id) => {
   const urls = {};
   for (const key in urlDatabase) {
@@ -64,16 +71,6 @@ const urlsForUser = (id) => {
 app.get("/", (req, res) => {
   res.redirect("/urls");
 });
-
-// app.get("/urls.json", (req, res) => {
-//   const email = req.session ? req.session["email"] : undefined;
-//   const user = getUserByEmail(email, users);
-//   res.json(urlsForUser(user.id));
-// });
-
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
 
 app.get("/urls", (req, res) => {
   const email = req.session ? req.session["email"] : undefined;
@@ -236,11 +233,6 @@ app.post("/login", (req, res) => {
     res.status(403).send("<h1>Password incorrect</h1>");
     return;
   }
-
-  // if (user.password !== password) {
-  //   res.status(403).send("<h1>Password incorrect</h1>");
-  //   return;
-  // }
 
   req.session.email = email;
   res.redirect("/urls");

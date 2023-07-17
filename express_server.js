@@ -23,7 +23,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({ // Set up cookieSession
   name: "session",
-  keys: ["key1", "key2"], // what is this for
+  keys: ["key1", "key2"],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
@@ -53,8 +53,7 @@ const users = {
 
 const urlsForUser = (id) => {
   const urls = {};
-  const keys = Object.keys(urlDatabase);
-  for (const key of keys) {
+  for (const key in urlDatabase) {
     if (urlDatabase[key].userID === id) {
       urls[key] = urlDatabase[key];
     }
@@ -62,21 +61,19 @@ const urlsForUser = (id) => {
   return urls;
 };
 
-app.use(express.urlencoded({ extended: true }));
-
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-app.get("/urls.json", (req, res) => {
-  const email = req.session ? req.session["email"] : undefined;
-  const user = getUserByEmail(email, users);
-  res.json(urlsForUser(user.id));
-});
+// app.get("/urls.json", (req, res) => {
+//   const email = req.session ? req.session["email"] : undefined;
+//   const user = getUserByEmail(email, users);
+//   res.json(urlsForUser(user.id));
+// });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 app.get("/urls", (req, res) => {
   const email = req.session ? req.session["email"] : undefined;

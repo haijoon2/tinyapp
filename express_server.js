@@ -62,7 +62,7 @@ const urlsForUser = (id) => {
 };
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
 
 // app.get("/urls.json", (req, res) => {

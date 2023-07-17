@@ -13,6 +13,8 @@ const generateRandomString = () => {
 const express = require("express");
 const bcrypt = require('bcrypt'); // Import the bcrypt module
 const cookieSession = require("cookie-session");
+const { getUserByEmail } = require("./helpers");
+
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -47,16 +49,6 @@ const users = {
     email: "b@hotmail.com",
     password: "$2b$10$FahsimwCsMUCeHD56gHKsONDy0HJ08LgexFWHlIUoeDBGvsdkWJ42",//bb
   },
-};
-
-const getUserByEmail = (email, userDataBase) => {
-  const users = Object.values(userDataBase);
-  for (const user of users) {
-    if (user.email === email) {
-      return user;
-    }
-  }
-  return undefined;
 };
 
 const urlsForUser = (id) => {

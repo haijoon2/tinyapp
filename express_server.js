@@ -49,11 +49,11 @@ const users = {
   },
 };
 
-const getUserByEmail = (email) => {
-  const keys = Object.keys(users);
-  for (const key of keys) {
-    if (users[key].email === email) {
-      return users[key];
+const getUserByEmail = (email, userDataBase) => {
+  const users = Object.values(userDataBase);
+  for (const user of users) {
+    if (user.email === email) {
+      return user;
     }
   }
   return undefined;
@@ -78,7 +78,7 @@ app.get("/", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   const email = req.session ? req.session["email"] : undefined;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
   res.json(urlsForUser(user.id));
 });
 
@@ -88,7 +88,7 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const email = req.session ? req.session["email"] : undefined;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   if (!user) {
     res.redirect("/login");
@@ -104,7 +104,7 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const email = req.session ? req.session["email"] : undefined;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   if (!user) {
     res.redirect("/login");
@@ -120,7 +120,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const email = req.session ? req.session["email"] : undefined;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
   const id = req.params.id;
 
   if (!urlDatabase[id]) {
@@ -159,7 +159,7 @@ app.get("/u/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   const email = req.session ? req.session["email"] : undefined;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   if (!user) {
     res.status(401).send("Please login or register");
@@ -180,7 +180,7 @@ app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = req.body.longURL;
   const email = req.session ? req.session["email"] : undefined;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   urlDatabase[id] = {
     longURL,
@@ -201,7 +201,7 @@ app.post("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const email = req.session ? req.session["email"] : undefined;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   if (!user) {
     res.status(403).send("Please login or register");
@@ -218,7 +218,7 @@ app.post("/urls", (req, res) => {
 
 app.get("/login", (req, res) => {
   const email = req.session ? req.session["email"] : undefined;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   if (user) {
     res.redirect("/urls");
@@ -234,7 +234,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   if (!user) {
     res.status(403).send("<h1>Email not found</h1>");
@@ -271,7 +271,7 @@ app.post("/register", (req, res) => {
     res.status(400).send("Email or Password cannot be empty");
   }
 
-  if (getUserByEmail(email)) {
+  if (getUserByEmail(email, users)) {
     res.status(400).send("Email already exists");
   }
   
@@ -289,7 +289,7 @@ app.post("/register", (req, res) => {
 
 app.get("/register", (req, res) => {
   const email = req.session ? req.session["email"] : undefined;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   if (user) {
     res.redirect("/urls");

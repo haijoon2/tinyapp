@@ -239,7 +239,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  req.session.email = null; // Clear the email cookie
+  req.session = null; // Clear the email cookie
   res.redirect("/login"); // Redirect the user back to the /urls page
 });
 

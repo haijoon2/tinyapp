@@ -1,22 +1,7 @@
-/**
- * Returns a random string of 6 alphanumeric characters.
- */
-const generateRandomString = () => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-
-  for (let i = 0; i < 6; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    result += characters.charAt(randomIndex);
-  }
-
-  return result;
-};
-
 const express = require("express");
 const bcrypt = require('bcrypt'); // Import the bcrypt module
 const cookieSession = require("cookie-session");
-const { getUserByEmail } = require("./helpers");
+const { getUserByEmail, generateRandomString, urlsForUser } = require("./helpers");
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -54,20 +39,6 @@ const users = {
   },
 };
 
-/**
- * Returns an object containing only the URLs where the userID
- * is equal to the id of the currently logged-in user.
- */
-const urlsForUser = (id) => {
-  const urls = {};
-  for (const key in urlDatabase) {
-    if (urlDatabase[key].userID === id) {
-      urls[key] = urlDatabase[key];
-    }
-  }
-  return urls;
-};
-
 app.get("/", (req, res) => {
   res.redirect("/urls");
 });
@@ -81,9 +52,9 @@ app.get("/urls", (req, res) => {
     return;
   }
 
-  const  templateVars = {
+  const templateVars = {
     user,
-    urls: urlsForUser(user.id)
+    urls: urlsForUser(user.id, urlDatabase) // pass the urlDatabase object to urlsForUser
   };
   res.render("urls_index", templateVars);
 });
@@ -195,10 +166,13 @@ app.post("/urls", (req, res) => {
   }
   
   const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
+
   urlDatabase[shortURL] = {
-    longURL: req.body.longURL,
+    longURL,
     userID: user.id
   };
+
   res.redirect(`/urls/${shortURL}`);
 });
 
